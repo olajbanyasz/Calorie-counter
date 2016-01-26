@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Calorie counter</title>
+    <link rel="stylesheet" href="./style.css"
+  </head>
+  <body>
+    <h1>Calorie counter</h1>
+    <div class="divider"></div>
+    <br>
+    <form class="input">
+      <input type="text" required="required" placeholder="Meal" id="new-meal"/>
+      <input type="number" required="required" placeholder="kCal" id="new-calories"/>
+      <input type="date" required="required" id="new-date"/>
+      <input type="button" id="add" value="OK"/>
+    </form>
+    <br>
+    <div class="divider"></div>
+    <br>
+    <div class="items-container"></div>
+    <br>
+    <div class="divider"></div>
+    <br>
+    <div class="filter">
+    <input type="date" required="required" id="date-filter"/>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
