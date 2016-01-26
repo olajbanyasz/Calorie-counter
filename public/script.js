@@ -15,6 +15,21 @@ document.getElementById('new-date').valueAsDate = new Date();
 addButton.addEventListener('click', callAddNewItem);
 dateFilter.addEventListener('input', mealFilter);
 
+function animateValue(id, start, end, speed) {
+    var current = start;
+    var increment = 10;
+    var obj = document.getElementById(id);
+    var timer = setInterval(function() {
+        increment = Math.floor(Math.pow(end-current, 0.85));
+        current += increment;
+        obj.innerText = current + ' kcal';
+        if (current === end) {
+            clearInterval(timer);
+        }
+    }, speed);
+}
+
+
 function callAddNewItem() {
   if (addNewMeal.value !== '' && addNewCalories.value !== '') {
     addNewItem(addNewMeal.value, addNewCalories.value, addNewDate.value);
@@ -29,13 +44,16 @@ function mealFilter() {
   selectedItemsArray.length = 0;
   caloriesSum = 0;
   itemsArray.forEach(function(item) {
-      if((new Date(item.date)).toLocaleDateString('hu-HU') === (new Date(event.target.value)).toLocaleDateString('hu-HU')) {
-        selectedItemsArray.push(item);
-        caloriesSum += item.calories;
+    if((new Date(item.date)).toLocaleDateString('hu-HU') === (new Date(event.target.value)).toLocaleDateString('hu-HU')) {
+      selectedItemsArray.push(item);
+      caloriesSum += item.calories;
       }
   });
-  summary.innerText = caloriesSum + ' kcal';
   displayItems(selectedItemsArray);
+  if (caloriesSum !== 0) {
+    animateValue('summary', 0, caloriesSum, 120);
+  }
+  summary.innerText = caloriesSum + ' kcal';
 }
 
 function clearItemsFromDisplay() {
@@ -63,8 +81,6 @@ function createRequest(cb) {
 
 function displayItems(itemsArray) {
   clearItemsFromDisplay();
-  //itemsArray = JSON.parse(response);
-
   itemsArray.forEach(function(item) {
     var newItem = document.createElement('div');
     var newMeal = document.createElement('span');
@@ -73,9 +89,7 @@ function displayItems(itemsArray) {
     newItem.setAttribute('id', item.id);
     newItem.setAttribute('class', 'item-row');
     itemsContainer.appendChild(newItem);
-    newItem.addEventListener('click', function() {
-      console.log(event.target);
-    });
+    newItem.addEventListener('dblclick', callDeleteItem);
     newItem.appendChild(newMeal);
     newItem.appendChild(newCalories);
     newItem.appendChild(newDate);
@@ -83,6 +97,24 @@ function displayItems(itemsArray) {
     newCalories.innerText = item.calories + ' kcal';
     newDate.innerText = (new Date(item.date)).toLocaleDateString('hu-HU');
   });
+}
+
+function callDeleteItem() {
+  deleteItem(event.target.parentNode.id);
+}
+
+function deleteItem(itemId) {
+  var request = new  XMLHttpRequest();
+  request.open('DELETE', url + '/' + itemId);
+  request.setRequestHeader('Content-Type', 'application/json');
+  request.send();
+  request.onreadystatechange = function() {
+    if (request.readyState === 4) {
+      createRequest(displayItems);
+      summary.innerText = 0 + ' kcal';
+    }
+  }
+  console.log(request);
 }
 
 function addNewItem (meal, calories, date) {

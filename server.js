@@ -23,6 +23,16 @@ app.get('/meals', function (req, res) {
   });
 });
 
+app.delete('/meals/:id', function (req, res) {
+  meal.del(req.params.id, function(err, result) {
+    if (err) {
+      res.json({status: 'not exists'});
+    } else {
+      res.json({status: 'ok'});
+    }
+  });
+});
+
 app.listen(3000, function () {
   console.log("Listening on port 3000...")
 });

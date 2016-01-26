@@ -35,6 +35,11 @@ input {
   height: 26px;
 }
 
+.summary {
+  color: #3f60ba;
+  font-weight: bold;
+}
+
 body {
   margin: 0 auto;
   width: 600px;
