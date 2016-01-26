@@ -22,7 +22,7 @@ function add(meal, cb) {
 }
 
 function getAll(cb) {
-  connection.query('SELECT * FROM meal ORDER BY date ASC' , cb);
+  connection.query('SELECT * FROM meal ORDER BY date DESC' , cb);
 }
 
 function del(id, cb) {

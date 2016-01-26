@@ -1,26 +1,41 @@
 'use strict'
 
+var itemsArray;
+var caloriesSum;
+var selectedItemsArray =  [];
 var addButton = document.getElementById('add');
 var addNewMeal = document.getElementById('new-meal');
 var addNewCalories = document.getElementById('new-calories');
 var addNewDate = document.getElementById('new-date');
+var summary = document.getElementById('summary');
 var itemsContainer = document.querySelector('.items-container');
-var filter = document.getElementById('date-filter');
+var dateFilter = document.getElementById('date-filter');
 var url = 'http://localhost:3000/meals';
 document.getElementById('new-date').valueAsDate = new Date();
 addButton.addEventListener('click', callAddNewItem);
-filter.addEventListener('select', callItemFilter);
+dateFilter.addEventListener('input', mealFilter);
 
 function callAddNewItem() {
   if (addNewMeal.value !== '' && addNewCalories.value !== '') {
     addNewItem(addNewMeal.value, addNewCalories.value, addNewDate.value);
   }
+  dateFilter.valueAsDate = null;
+  summary.innerText = 0 + ' kcal';
   setTimeout(createRequest(displayItems),600);
   clearInputFields();
 }
 
-function callItemFilter() {
-
+function mealFilter() {
+  selectedItemsArray.length = 0;
+  caloriesSum = 0;
+  itemsArray.forEach(function(item) {
+      if((new Date(item.date)).toLocaleDateString('hu-HU') === (new Date(event.target.value)).toLocaleDateString('hu-HU')) {
+        selectedItemsArray.push(item);
+        caloriesSum += item.calories;
+      }
+  });
+  summary.innerText = caloriesSum + ' kcal';
+  displayItems(selectedItemsArray);
 }
 
 function clearItemsFromDisplay() {
@@ -40,14 +55,15 @@ function createRequest(cb) {
   request.send();
   request.onreadystatechange = function() {
     if (request.readyState === 4) {
-      displayItems(request.response);
+      itemsArray = JSON.parse(request.response);
+      displayItems(itemsArray);
     }
   }
 }
 
-function displayItems(response) {
+function displayItems(itemsArray) {
   clearItemsFromDisplay();
-  var itemsArray = JSON.parse(response);
+  //itemsArray = JSON.parse(response);
 
   itemsArray.forEach(function(item) {
     var newItem = document.createElement('div');
@@ -64,7 +80,7 @@ function displayItems(response) {
     newItem.appendChild(newCalories);
     newItem.appendChild(newDate);
     newMeal.innerText = item.meal;
-    newCalories.innerText = item.calories;
+    newCalories.innerText = item.calories + ' kcal';
     newDate.innerText = (new Date(item.date)).toLocaleDateString('hu-HU');
   });
 }
@@ -76,4 +92,4 @@ function addNewItem (meal, calories, date) {
   request.send(JSON.stringify({meal: meal, calories: calories, date: date}));
 }
 
-createRequest("2016-01-24", displayItems);
+createRequest(displayItems);
