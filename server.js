@@ -3,7 +3,7 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var app = express();
-var meal = require('./meal.js');
+
 
 app.use(logRequest);
 app.use(express.static("public"));

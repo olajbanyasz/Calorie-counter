@@ -15,24 +15,9 @@ document.getElementById('new-date').valueAsDate = new Date();
 addButton.addEventListener('click', callAddNewItem);
 dateFilter.addEventListener('input', mealFilter);
 
-function animateValue(id, start, end, speed) {
-    var current = start;
-    var increment = 10;
-    var obj = document.getElementById(id);
-    var timer = setInterval(function() {
-        increment = Math.floor(Math.pow(end-current, 0.85));
-        current += increment;
-        obj.innerText = current + ' kcal';
-        if (current === end) {
-            clearInterval(timer);
-        }
-    }, speed);
-}
-
-
 function callAddNewItem() {
   if (addNewMeal.value !== '' && addNewCalories.value !== '') {
-    addNewItem(addNewMeal.value, addNewCalories.value, addNewDate.value);
+    addNewItem(addNewMeal.value.toUpperCase(), Math.abs(parseInt(addNewCalories.value)), addNewDate.value);
   }
   dateFilter.valueAsDate = null;
   summary.innerText = 0 + ' kcal';
@@ -51,9 +36,10 @@ function mealFilter() {
   });
   displayItems(selectedItemsArray);
   if (caloriesSum !== 0) {
-    animateValue('summary', 0, caloriesSum, 120);
+    animatedCounter('summary', 0, caloriesSum, 120);
+  } else {
+    summary.innerText = caloriesSum + ' kcal';
   }
-  summary.innerText = caloriesSum + ' kcal';
 }
 
 function clearItemsFromDisplay() {
@@ -79,23 +65,32 @@ function createRequest(cb) {
   }
 }
 
+function createNewRow(item) {
+  var newRow = document.createElement('div');
+  newRow.setAttribute('id', item.id);
+  newRow.setAttribute('class', 'item-row');
+  itemsContainer.appendChild(newRow);
+  newRow.addEventListener('dblclick', callDeleteItem);
+  createSpans(newRow, item);
+}
+
+function createSpan(newRow, text, item, itemattribute) {
+  var newspan = document.createElement('span');
+  newRow.appendChild(newspan);
+  newspan.innerText = item[itemattribute] + text;
+}
+
+function createSpans(newRow, item) {
+  item.date = (new Date(item.date)).toLocaleDateString('hu-HU');
+  createSpan(newRow, '', item, 'meal');
+  createSpan(newRow, ' kcal', item, 'calories');
+  createSpan(newRow, '', item, 'date');
+}
+
 function displayItems(itemsArray) {
   clearItemsFromDisplay();
   itemsArray.forEach(function(item) {
-    var newItem = document.createElement('div');
-    var newMeal = document.createElement('span');
-    var newCalories = document.createElement('span');
-    var newDate = document.createElement('span');
-    newItem.setAttribute('id', item.id);
-    newItem.setAttribute('class', 'item-row');
-    itemsContainer.appendChild(newItem);
-    newItem.addEventListener('dblclick', callDeleteItem);
-    newItem.appendChild(newMeal);
-    newItem.appendChild(newCalories);
-    newItem.appendChild(newDate);
-    newMeal.innerText = item.meal;
-    newCalories.innerText = item.calories + ' kcal';
-    newDate.innerText = (new Date(item.date)).toLocaleDateString('hu-HU');
+    createNewRow(item);
   });
 }
 
